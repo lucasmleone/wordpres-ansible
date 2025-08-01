@@ -1,0 +1,81 @@
+---
+# Step 4: Download and configure WordPress
+- name: Download and extract the latest version of WordPress
+  unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: "/var/www/html"
+    remote_src: yes
+    creates: "/var/www/html/wordpress"
+
+- name: Change owner and permissions of the WordPress folder
+  ansible.builtin.file:
+    path: /var/www/html/wordpress/
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+# Configure wp-config.php
+- name: Copy wp-config-sample.php to wp-config.php on the remote node
+  ansible.builtin.copy:
+    src: /var/www/html/wordpress/wp-config-sample.php
+    dest: /var/www/html/wordpress/wp-config.php
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    remote_src: true
+
+- name: Set DB_NAME in wp-config.php
+  ansible.builtin.lineinfile:
+    path: /var/www/html/wordpress/wp-config.php
+    regexp: "^define\\s*\\(\\s*'DB_NAME'.*"
+    line: "define('DB_NAME', 'wordpress_db');"
+    owner: www-data
+    group: www-data
+
+- name: Set DB_USER in wp-config.php
+  ansible.builtin.lineinfile:
+    path: /var/www/html/wordpress/wp-config.php
+    regexp: "^define\\s*\\(\\s*'DB_USER'.*"
+    line: "define('DB_USER', 'wordpress_user');"
+    owner: www-data
+    group: www-data
+
+- name: Set DB_PASSWORD in wp-config.php
+  ansible.builtin.lineinfile:
+    path: /var/www/html/wordpress/wp-config.php
+    regexp: "^define\\s*\\(\\s*'DB_PASSWORD'.*"
+    line: "define('DB_PASSWORD', 'test');"
+    owner: www-data
+    group: www-data
+
+- name: Set DB_HOST in wp-config.php
+  ansible.builtin.lineinfile:
+    path: /var/www/html/wordpress/wp-config.php
+    regexp: "^define\\s*\\(\\s*'DB_HOST'.*"
+    line: "define('DB_HOST', 'localhost');"
+    owner: www-data
+    group: www-data
+
+# Configure Apache for WordPress
+- name: Copy the 000-default.conf file as a base for WordPress
+  ansible.builtin.copy:
+    src: /etc/apache2/sites-available/000-default.conf
+    dest: /etc/apache2/sites-available/wordpress.conf
+    remote_src: true
+
+- name: Set correct DocumentRoot in wordpress.conf
+  ansible.builtin.replace:
+    path: /etc/apache2/sites-available/wordpress.conf
+    regexp: 'DocumentRoot\s+/var/www/html'
+    replace: 'DocumentRoot /var/www/html/wordpress'
+
+- name: Enable the wordpress.conf site
+  ansible.builtin.command: a2ensite wordpress.conf
+
+- name: Disable the 000-default.conf site
+  ansible.builtin.command: a2dissite 000-default.conf
+
+- name: Restart Apache2  
+  ansible.builtin.service:
+    name: apache2
+    state: restarted

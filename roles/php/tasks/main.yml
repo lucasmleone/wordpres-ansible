@@ -1,0 +1,6 @@
+---
+# Step 2: Install PHP and required extensions
+- name: Install PHP packages
+  ansible.builtin.apt:
+    name: "{{ php_packages }}"
+    state: latest

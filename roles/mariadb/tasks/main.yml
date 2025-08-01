@@ -1,0 +1,82 @@
+---
+# Step 3: Install and configure MariaDB
+- name: Install MariaDB server
+  ansible.builtin.apt:
+    name: mariadb-server
+    state: latest
+
+- name: Install MariaDB client
+  ansible.builtin.apt:
+    name: mariadb-client
+    state: latest
+
+- name: Install Python driver for MariaDB/MySQL
+  ansible.builtin.apt:
+    name: python3-mysqldb
+    state: latest
+
+- name: Ensure MariaDB is started
+  ansible.builtin.service:
+    name: mariadb
+    state: started
+
+# MariaDB security and configuration
+- name: Set root password
+  community.mysql.mysql_user:
+    name: root
+    host: localhost
+    password: "test"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    check_implicit_admin: yes
+    state: present
+
+- name: Remove anonymous users
+  community.mysql.mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+    login_user: root
+    login_password: "test"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Deny remote access to root user
+  community.mysql.mysql_user:
+    name: root
+    host: "{{ item }}"
+    state: absent
+    login_user: root
+    login_password: "test"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  loop:
+    - '%'
+    - '::1'
+    - '127.0.0.1'
+  when: item != 'localhost'
+
+- name: Remove test database
+  community.mysql.mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "test"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+# Create database and user for WordPress
+- name: Create database for WordPress
+  community.mysql.mysql_db:
+    name: wordpress_db
+    state: present
+    login_user: root
+    login_password: "test"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create user for WordPress and grant privileges
+  community.mysql.mysql_user:
+    name: wordpress_user
+    password: "test"
+    host: localhost
+    priv: 'wordpress_db.*:ALL'
+    state: present
+    login_user: root
+    login_password: "test"
+    login_unix_socket: /var/run/mysqld/mysqld.sock

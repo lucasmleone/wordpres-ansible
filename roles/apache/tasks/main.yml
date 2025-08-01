@@ -1,0 +1,35 @@
+---
+# Step 1: Show server information
+- name: Show server information
+  debug:
+    msg:
+      - "=== Configuring server {{ inventory_hostname }} ==="
+      - "IP: {{ ansible_host }}"
+      - "System: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+# Step 2: Update system package cache
+- name: Update package cache
+  ansible.builtin.apt:
+    name: '*'
+    state: latest
+  when: ansible_os_family == "Debian"
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+# Step 3: Install and configure Apache2
+- name: Install Apache2
+  ansible.builtin.apt:
+    name: apache2
+    state: latest
+
+- name: Start Apache2 service
+  ansible.builtin.service:
+    name: apache2
+    state: started
+
+- name: Remove default Apache index.html file
+  ansible.builtin.file:
+    path: /var/www/html/index.html
+    state: absent
