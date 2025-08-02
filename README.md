@@ -1,8 +1,8 @@
-# Challenge 6 - WordPress Installation with Ansible using Roles
+# Automated WordPress Installation with Ansible using Roles
 
-This project automates the installation of WordPress on Ubuntu 22.04 using Ansible and a modular structure based on roles. Each role is responsible for a specific part of the installation and configuration process, fulfilling all the requirements of challenge 6.
+This project automates the installation of WordPress on Ubuntu 22.04 using Ansible and a modular structure based on roles. Each role is responsible for a specific part of the installation and configuration process, making it easy to manage and extend.
 
-## Architecture used
+## Architecture
 
 - **Ansible Host:** Local machine created with Multipass (Ubuntu).
 - **Managed Node:** EC2 instance in AWS with Ubuntu 22.04.
