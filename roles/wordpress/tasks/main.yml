@@ -44,7 +44,7 @@
   ansible.builtin.lineinfile:
     path: /var/www/html/wordpress/wp-config.php
     regexp: "^define\\s*\\(\\s*'DB_PASSWORD'.*"
-    line: "define('DB_PASSWORD', 'test');"
+    line: "define('DB_PASSWORD', '{{ wordpress_db_password }}');"
     owner: www-data
     group: www-data
 

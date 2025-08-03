@@ -25,7 +25,7 @@
   community.mysql.mysql_user:
     name: root
     host: localhost
-    password: "test"
+    password: "{{ mysql_root_password }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock
     check_implicit_admin: yes
     state: present
@@ -36,7 +36,7 @@
     host_all: true
     state: absent
     login_user: root
-    login_password: "test"
+    login_password: "{{ mysql_root_password }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
 - name: Deny remote access to root user
@@ -45,7 +45,7 @@
     host: "{{ item }}"
     state: absent
     login_user: root
-    login_password: "test"
+    login_password: "{{ mysql_root_password }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock
   loop:
     - '%'
@@ -58,7 +58,7 @@
     name: test
     state: absent
     login_user: root
-    login_password: "test"
+    login_password: "{{ mysql_root_password }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
 # Create database and user for WordPress
@@ -67,16 +67,16 @@
     name: wordpress_db
     state: present
     login_user: root
-    login_password: "test"
+    login_password: "{{ mysql_root_password }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
 - name: Create user for WordPress and grant privileges
   community.mysql.mysql_user:
     name: wordpress_user
-    password: "test"
+    password: "{{ wordpress_db_password }}"
     host: localhost
     priv: 'wordpress_db.*:ALL'
     state: present
     login_user: root
-    login_password: "test"
+    login_password: "{{ mysql_root_password }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock

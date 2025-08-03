@@ -1,70 +1,71 @@
-# Automated WordPress Installation with Ansible using Roles
+# Desafío 6 - Instalación de WordPress con Ansible usando Roles
 
-This project automates the installation of WordPress on Ubuntu 22.04 using Ansible and a modular structure based on roles. Each role is responsible for a specific part of the installation and configuration process, making it easy to manage and extend.
+Este proyecto automatiza la instalación de WordPress en Ubuntu 22.04 utilizando Ansible y una estructura modular basada en roles. Cada rol se encarga de una parte específica del proceso de instalación y configuración, cumpliendo todos los requisitos del desafío 6.
 
-## Architecture
+## Arquitectura utilizada
 
-- **Ansible Host:** Local machine created with Multipass (Ubuntu).
-- **Managed Node:** EC2 instance in AWS with Ubuntu 22.04.
-- **Connection:** SSH between the host and the remote node.
+- **Host de Ansible:** Máquina local creada con Multipass (Ubuntu).
+- **Nodo gestionado:** Instancia EC2 en AWS con Ubuntu 22.04.
+- **Conexión:** SSH entre el host y el nodo remoto.
 
-## Project structure
+## Estructura del proyecto
 
-- `playbook.yml`: Main playbook that calls the roles.
-- `roles/apache`: Installation and configuration of Apache.
-- `roles/php`: Installation of PHP and required extensions.
-- `roles/mariadb`: Installation, securing, and configuration of MariaDB.
-- `roles/wordpress`: Installation and configuration of WordPress and Apache to serve the site.
+- `playbook.yml`: Playbook principal que llama a los roles.
+- `roles/apache`: Instalación y configuración de Apache.
+- `roles/php`: Instalación de PHP y extensiones necesarias.
+- `roles/mariadb`: Instalación, aseguramiento y configuración de MariaDB.
+- `roles/wordpress`: Instalación y configuración de WordPress y Apache para servir el sitio.
 
-## Automated steps
 
-1. **Installation and configuration of Apache**
-2. **Installation of PHP and extensions**
-3. **Installation and securing of MariaDB**
-4. **Creation of database and user for WordPress**
-5. **Download and configuration of WordPress**
-6. **Apache configuration for WordPress**
+## Pasos automatizados
 
-## Usage
+1. **Instalación y configuración de Apache**
+2. **Instalación de PHP y extensiones**
+3. **Instalación y aseguramiento de MariaDB**
+4. **Creación de base de datos y usuario para WordPress**
+5. **Descarga y configuración de WordPress**
+6. **Configuración de Apache para WordPress**
 
-1. Edit your inventory file to define the servers (local host and EC2 node).
+## Uso
+
+1. Edita tu archivo de inventario para definir los servidores (host local y nodo EC2).
    
-   - The `inventory.ini` file must contain the public IP of your EC2 instance and SSH access data.
+   - El archivo `inventory.ini` debe contener la IP pública de tu instancia EC2 y los datos de acceso SSH.
    
-   - Ensure that the Ansible host (Multipass) has SSH access to the EC2 node and that port 22 is open in the AWS security group.
+   - Asegúrate de que el host de Ansible (Multipass) tenga acceso SSH al nodo EC2 y que el puerto 22 esté abierto en el grupo de seguridad de AWS.
 
-2. Run the main playbook:
+2. Ejecuta el playbook principal:
 
    ```bash
    ansible-playbook -i inventory.ini site.yml
    ```
 
-3. Once finished, open your browser and access the public IP of your EC2 instance to verify that WordPress is working:
+3. Al finalizar, abre tu navegador y accede a la IP pública de tu instancia EC2 para comprobar que WordPress está funcionando:
 
    ```
-   http://<EC2_PUBLIC_IP>
+   http://<IP_PUBLICA_EC2>
    ```
 
-## Example of results and structure
+## Ejemplo de resultados y estructura
 
-### Project structure
+### Estructura del proyecto
 
-![Folder structure](./img/tree.png)
+![Estructura de carpetas](./img/tree.png)
 
-### Successful playbook execution
+### Ejecución exitosa del playbook
 
 ![Play recap](./img/playbookok.png)
 
 ### AWS
 
-![EC2 instance](./img/ec2.png)
-![Network configuration](./img/aws%20tree.png)
+![Instancia EC2](./img/ec2.png)
+![Configuración de red](./img/aws%20tree.png)
 
-### WordPress installed and working
-![WordPress working](./img/wordpress2.png)
+### WordPress instalado y funcionando
+![WordPress funcionando](./img/wordpress2.png)
 
-![WordPress working](./img/wordpress.png)
+![WordPress funcionando](./img/wordpress.png)
 
-## Diagram
+## Diagrama
 
-![Diagram](./img/diagrama6.png)
+![Diagrama](./img/diagrama6.png)
