@@ -3,6 +3,8 @@
   hosts: servers
   become: true
   gather_facts: yes
+  vars_files:
+  - group_vars/all/vault.yml
 
   roles:
     - apache
