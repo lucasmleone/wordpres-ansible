@@ -1,71 +1,79 @@
-# Desafío 6 - Instalación de WordPress con Ansible usando Roles
+# Automated WordPress Deployment with Ansible Roles
 
-Este proyecto automatiza la instalación de WordPress en Ubuntu 22.04 utilizando Ansible y una estructura modular basada en roles. Cada rol se encarga de una parte específica del proceso de instalación y configuración, cumpliendo todos los requisitos del desafío 6.
+A modular, production-ready Ansible project for installing and configuring WordPress on Ubuntu 22.04. This repository provides reusable roles for Apache, PHP, MariaDB, and WordPress—ideal for teams and third-party integration.
 
-## Arquitectura utilizada
+## Architecture
 
-- **Host de Ansible:** Máquina local creada con Multipass (Ubuntu).
-- **Nodo gestionado:** Instancia EC2 en AWS con Ubuntu 22.04.
-- **Conexión:** SSH entre el host y el nodo remoto.
+- **Ansible Controller:** Any Linux host with Ansible installed.
+- **Managed Nodes:** Ubuntu 22.04 servers (e.g., AWS EC2 instances).
+- **Connectivity:** SSH with privilege escalation (sudo).
 
-## Estructura del proyecto
+## Repository Layout
 
-- `playbook.yml`: Playbook principal que llama a los roles.
-- `roles/apache`: Instalación y configuración de Apache.
-- `roles/php`: Instalación de PHP y extensiones necesarias.
-- `roles/mariadb`: Instalación, aseguramiento y configuración de MariaDB.
-- `roles/wordpress`: Instalación y configuración de WordPress y Apache para servir el sitio.
+├── inventory.ini               # Inventory file for target hosts  
+├── site.yml                    # Main playbook  
+├── group_vars/                 # Shared variables  
+│   ├── all.yml                 # Non-sensitive defaults  
+│   └── vault.yml               # Encrypted secrets (Ansible Vault)  
+└── roles/  
+    ├── apache/                 # Apache install & config  
+    ├── php/                    # PHP and extensions  
+    ├── mariadb/                # MariaDB install & hardening  
+    └── wordpress/              # Download, configure, and secure WP  
 
+## Prerequisites
 
-## Pasos automatizados
+- Ansible ≥ 2.9  
+- SSH access to all target hosts  
+- (Optional) Ansible Vault for secrets management  
 
-1. **Instalación y configuración de Apache**
-2. **Instalación de PHP y extensiones**
-3. **Instalación y aseguramiento de MariaDB**
-4. **Creación de base de datos y usuario para WordPress**
-5. **Descarga y configuración de WordPress**
-6. **Configuración de Apache para WordPress**
+## Getting Started
 
-## Uso
-
-1. Edita tu archivo de inventario para definir los servidores (host local y nodo EC2).
-   
-   - El archivo `inventory.ini` debe contener la IP pública de tu instancia EC2 y los datos de acceso SSH.
-   
-   - Asegúrate de que el host de Ansible (Multipass) tenga acceso SSH al nodo EC2 y que el puerto 22 esté abierto en el grupo de seguridad de AWS.
-
-2. Ejecuta el playbook principal:
-
+1. Clone this repository:  
    ```bash
-   ansible-playbook -i inventory.ini site.yml
+   git clone https://github.com/yourorg/wordpress-ansible.git
+   cd wordpress-ansible
    ```
 
-3. Al finalizar, abre tu navegador y accede a la IP pública de tu instancia EC2 para comprobar que WordPress está funcionando:
-
+2. Define your inventory in `inventory.ini`:  
+   ```ini
+   [web]
+   192.0.2.10 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
    ```
-   http://<IP_PUBLICA_EC2>
+
+3. Configure non-sensitive defaults in `group_vars/all.yml`.
+
+4. Create and encrypt `group_vars/vault.yml` for database credentials:  
+   ```bash
+   ansible-vault create group_vars/vault.yml
    ```
 
-## Ejemplo de resultados y estructura
+5. Run the playbook:  
+   ```bash
+   ansible-playbook -i inventory.ini site.yml --ask-vault-pass
+   ```
 
-### Estructura del proyecto
+6. Once completed, visit `http://<your_server_ip>` to finalize WordPress setup.
 
-![Estructura de carpetas](./img/tree.png)
+## Customization
 
-### Ejecución exitosa del playbook
+- **Variables:** Adjust paths, package lists, and credentials in `group_vars/all.yml`.  
+- **Templates:** Tweak Apache vhost in `roles/wordpress/templates/wordpress.conf.j2`.  
+- **Extensions:** Enable or disable PHP modules in `roles/php/vars/main.yml`.  
 
-![Play recap](./img/playbookok.png)
+## Security and Best Practices
 
-### AWS
+- Store sensitive data (passwords, API keys) in Ansible Vault (`vault.yml`).  
+- Use least-privilege users and secure file permissions (`www-data:www-data`, `0644/0755`).  
+- Harden MariaDB by removing anonymous accounts, disabling remote root, and deleting test databases.  
+- Generate WordPress salt keys via the official API for session security.  
+- Enable Apache security headers (X-Frame-Options, X-Content-Type-Options, etc.).  
 
-![Instancia EC2](./img/ec2.png)
-![Configuración de red](./img/aws%20tree.png)
+## Contributing
 
-### WordPress instalado y funcionando
-![WordPress funcionando](./img/wordpress2.png)
+1. Fork the repository  
+2. Create a feature branch (`git checkout -b feature/xyz`)  
+3. Commit your changes (`git commit -m "Add xyz"`)  
+4. Push and open a Pull Request  
 
-![WordPress funcionando](./img/wordpress.png)
 
-## Diagrama
-
-![Diagrama](./img/diagrama6.png)
